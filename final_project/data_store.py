@@ -12,6 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent
 EMPLOYEES_JSON = BASE_DIR / "employees.json"
 MENU_JSON = BASE_DIR / "menu.json"
 ORDERS_JSON = BASE_DIR / "orders.json"
+FAVORITES_JSON = BASE_DIR / "favorites.json"
 
 LEGACY_EMPLOYEES_TXT = BASE_DIR / "employees.txt"
 LEGACY_MENU_TXT = BASE_DIR / "menu.txt"
@@ -146,6 +147,9 @@ def ensure_json_files() -> None:
     if not ORDERS_JSON.exists():
         _save_json(ORDERS_JSON, _parse_legacy_orders())
 
+    if not FAVORITES_JSON.exists():
+        _save_json(FAVORITES_JSON, {})
+
 
 def load_employees() -> dict[str, dict[str, str]]:
     ensure_json_files()
@@ -200,6 +204,19 @@ def save_orders(orders: list[dict[str, Any]]) -> None:
     _save_json(ORDERS_JSON, orders)
 
 
+def load_favorites() -> dict[str, dict[str, Any]]:
+    ensure_json_files()
+    value = _load_json(FAVORITES_JSON, {})
+    if isinstance(value, dict):
+        return {str(k): v for k, v in value.items() if isinstance(v, dict)}
+    return {}
+
+
+def save_favorites(favorites: dict[str, dict[str, Any]]) -> None:
+    ensure_json_files()
+    _save_json(FAVORITES_JSON, favorites)
+
+
 def next_order_id(orders: list[dict[str, Any]]) -> int:
     max_id = 0
     for order in orders:
@@ -212,4 +229,3 @@ def next_order_id(orders: list[dict[str, Any]]) -> int:
 
 def now_iso() -> str:
     return datetime.now().isoformat(timespec="seconds")
-
